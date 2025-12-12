@@ -1,24 +1,31 @@
 import { create } from "zustand";
 
 export const useTaskStore = create((set) => ({
+  status: "todo",
+
+  setStatus: (s) => set({ status: s }),
+
   tasks: [
-    { id: "1", title: "Design UI", status: "todo" },
-    { id: "2", title: "Setup Firebase", status: "inprogress" },
-    { id: "3", title: "Create Charts", status: "done" },
+    {
+      id: "1",
+      title: "Login Page UI Design",
+      assigned: "DS (avatar)",
+      deadline: "20 DEC 0000",
+      tag: "Frontend",
+      status: "todo",
+      progress: 0.4,
+    },
+    {
+      id: "2",
+      title: "Dashboard Layout",
+      assigned: "MK (avatar)",
+      deadline: "22 DEC 0000",
+      tag: "Frontend",
+      status: "review",
+      progress: 0.8,
+    },
   ],
 
-  addTask: (title) =>
-    set((state) => ({
-      tasks: [
-        ...state.tasks,
-        { id: Date.now().toString(), title, status: "todo" },
-      ],
-    })),
-
-  updateTaskStatus: (taskId, newStatus) =>
-    set((state) => ({
-      tasks: state.tasks.map((t) =>
-        t.id === taskId ? { ...t, status: newStatus } : t
-      ),
-    })),
+  getTasksByStatus: (status) =>
+    set((state) => ({ tasks: state.tasks.filter((t) => t.status === status) })),
 }));
