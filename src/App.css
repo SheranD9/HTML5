@@ -76,3 +76,81 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 10;
 }
+.change-button {
+  background-color: #42a5f5;
+  color: white;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 10px;
+}
+
+/*====
+    sidebar
+====*/
+.sidebar {
+  width: 230px;
+  height: 100vh;
+  background: #1e1e1e;
+  color: white;
+  position: fixed;
+  top: 0;
+  right: -230px;
+  transition: left 0.3s ease;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.sidebar.open {
+  right: 0;
+}
+
+.sidebar-title {
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin: 20px 0;
+}
+
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.sidebar a:hover {
+  opacity: 0.7;
+}
+
+.sidebar-toggle {
+  position: fixed;
+  top: 70px;
+  right: 10px;
+  z-index: 1100;
+  background: #1e1e1e;
+  color: white;
+  border: none;
+  font-size: 24px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.sidebar-toggle:hover {
+  opacity: 0.5;
+}
+
+.page-content {
+  margin-left: 0;
+  transition: margin-left 0.3s ease;
+}
+/*========*/
