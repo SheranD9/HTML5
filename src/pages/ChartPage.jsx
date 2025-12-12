@@ -1,5 +1,4 @@
 import React from 'react';
-import './ChartPage.css';
 // import { FaTimes } from 'react-icons/fa';
 
 // ヘッダー部品
