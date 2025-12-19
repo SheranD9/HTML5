@@ -1,22 +1,26 @@
 import React from 'react';
+import { useTaskStore } from '../../store/useTaskStore';
 
-// --- 設定値 ---
+// 定数定義
 const ROW_HEIGHT = 50;
 const DAY_WIDTH = 40;
 const HEADER_HEIGHT = 30;
-
-// --- ダミーデータ---
-const mockTasks = [
-  { id: "1", title: "要件定義", startDay: 0, duration: 5, row: 0 },
-  { id: "2", title: "UIデザイン", startDay: 2, duration: 4, row: 1 },
-  { id: "3", title: "実装", startDay: 6, duration: 8, row: 2 },
-  { id: "4", title: "テスト", startDay: 12, duration: 3, row: 3 },
-];
+const PROJECT_START = "2025-12-01";
 
 const GanttTimeline = () => {
-  // 全体の幅を計算
-  const totalWidth = 20 * DAY_WIDTH;
-  const totalHeight = mockTasks.length * ROW_HEIGHT + HEADER_HEIGHT;
+  const { tasks } = useTaskStore();
+
+  // 日付の差分（日数）を計算する関数
+  const getDayOffset = (dateStr) => {
+    const start = new Date(PROJECT_START);
+    const target = new Date(dateStr);
+    const diffTime = target - start;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  // 全体の幅と高さの計算
+  const totalWidth = 30 * DAY_WIDTH;
+  const totalHeight = Math.max(tasks.length * ROW_HEIGHT + HEADER_HEIGHT, 400);
 
   return (
     <div style={{
@@ -28,49 +32,57 @@ const GanttTimeline = () => {
     }}>
       <h3>ガントチャート</h3>
 
-      {/* SVG描画エリア */}
       <svg width={totalWidth} height={totalHeight} style={{ border: '1px solid #eee', marginTop: '10px' }}>
 
-        {/* 1. 背景のグリッド線を描く */}
-        {Array.from({ length: 20 }).map((_, dayIndex) => (
-          <line
-            key={dayIndex}
-            x1={dayIndex * DAY_WIDTH}
-            y1={0}
-            x2={dayIndex * DAY_WIDTH}
-            y2={totalHeight}
-            stroke="#f0f0f0"
-            strokeWidth="1"
-          />
+        {/* 背景のグリッド線 */}
+        {Array.from({ length: 30 }).map((_, i) => (
+          <g key={i}>
+            <line
+              x1={i * DAY_WIDTH} y1={0}
+              x2={i * DAY_WIDTH} y2={totalHeight}
+              stroke="#f0f0f0" strokeWidth="1"
+            />
+            {/* 日付ヘッダー */}
+            <text x={i * DAY_WIDTH + 5} y={20} fontSize="10" fill="#999">
+              {i + 1}
+            </text>
+          </g>
         ))}
 
-        {/* 2. タスクバーを描く */}
-        {mockTasks.map((task) => {
+        {/* タスクバー描画 */}
+        {tasks.map((task, index) => {
+          const dayOffset = getDayOffset(task.startDate);
+
           // 座標計算
-          const x = task.startDay * DAY_WIDTH;
-          const y = task.row * ROW_HEIGHT + HEADER_HEIGHT + 10;
+          const x = dayOffset * DAY_WIDTH;
+          const y = index * ROW_HEIGHT + HEADER_HEIGHT + 10;
           const width = task.duration * DAY_WIDTH;
           const height = ROW_HEIGHT - 20;
+
+          // ステータスごとの色分け
+          const color = task.status === 'done' ? '#10B981' : // 緑
+            task.status === 'inprogress' ? '#3B82F6' : // 青
+              '#6B7280'; // グレー
 
           return (
             <g key={task.id}>
               {/* バー本体 */}
               <rect
-                x={x}
-                y={y}
-                width={width}
-                height={height}
-                fill="#4F46E5"
+                x={x} y={y}
+                width={width} height={height}
+                fill={color}
                 rx="5"
                 style={{ cursor: 'pointer' }}
               />
-              {/* タスク名のテキスト */}
+
+              {/* タスク名 */}
               <text
                 x={x + 5}
                 y={y + height / 2 + 5}
                 fill="white"
                 fontSize="12"
                 pointerEvents="none"
+                style={{ fontWeight: 'bold' }}
               >
                 {task.title}
               </text>
