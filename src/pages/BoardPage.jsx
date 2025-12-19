@@ -1,22 +1,35 @@
-// src/pages/BoardPage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ModeToggle from "../components/board/MoodToggle";
-import StatusTabs from "../components/board/StatusTab"; // reuse your file or the one I provided earlier
+import StatusTabs from "../components/board/StatusTab";
 import TaskCard from "../components/board/TaskCard";
 import TimelineGrid from "../components/board/TimelineGrid";
 import TaskCreationModal from "../components/board/TaskCreationModel";
 import ChangeLogPanel from "../components/board/ChangeLogPanel";
 import SOSButton from "../components/board/SOSButton";
 import { useTaskStore } from "../store/useTaskStore";
+import useTasks from "../hooks/useTasks";
+
+const PROJECT_ID = "web-app-1fb26"; // Replace with your actual project ID
 
 const BoardPage = () => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openLog, setOpenLog] = useState(false);
 
+  // 1. Fetch data from Firebase using your hook
+  const { tasks: firestoreTasks } = useTasks(PROJECT_ID);
+
   const mode = useTaskStore(s => s.mode);
   const statusFilter = useTaskStore(s => s.statusFilter);
   const tasks = useTaskStore(s => s.tasks);
+  const setStoreTasks = useTaskStore(s => s.setTasks);
   const filtered = tasks.filter(t => t.status === statusFilter);
+
+  // 2. Sync Firebase data into the Zustand store whenever it changes
+  useEffect(() => {
+    if (firestoreTasks) {
+      setStoreTasks(firestoreTasks);
+    }
+  }, [firestoreTasks, setStoreTasks]);
 
   return (
     <div className="flex">
@@ -56,7 +69,11 @@ const BoardPage = () => {
 
       <ChangeLogPanel open={openLog} onClose={() => setOpenLog(false)} />
 
-      <TaskCreationModal open={openCreate} onClose={()=>setOpenCreate(false)} />
+      <TaskCreationModal
+        open={openCreate}
+        onClose={()=>setOpenCreate(false)}
+        projectId={PROJECT_ID}
+      />
     </div>
   );
 };

@@ -1,9 +1,10 @@
 // src/components/TaskCreationModal.jsx
 import React, { useState } from "react";
-import { useTaskStore } from "../../store/useTaskStore";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../../config/firebase-config";
 
-const TaskCreationModal = ({ open, onClose }) => {
-  const addTask = useTaskStore((s) => s.addTask);
+const TaskCreationModal = ({ open, onClose, projectId }) => {
+  // const addTask = useTaskStore((s) => s.addTask); // No longer needed, we save to DB directly
   const [title, setTitle] = useState("");
   const [assigned, setAssigned] = useState("");
   const [deadline, setDeadline] = useState("");
@@ -13,20 +14,29 @@ const TaskCreationModal = ({ open, onClose }) => {
   const [startDayIndex, setStartDayIndex] = useState(0);
   const [endDayIndex, setEndDayIndex] = useState(0);
 
-  const submit = () => {
+  const submit = async () => {
     const subs = subtasksText
       .split("\n")
       .map((s) => s.trim())
-      .filter(Boolean);
-    addTask({
+      .filter(Boolean)
+      .map((text, i) => ({
+        id: `sub-${Date.now()}-${i}`,
+        text,
+        done: false
+      }));
+
+    await addDoc(collection(db, "tasks"), {
       title,
       assigned,
       deadline,
       tag,
       subtasks: subs,
       status,
+      progress: 0, // New tasks start at 0%
       startDayIndex: Number(startDayIndex),
       endDayIndex: Number(endDayIndex),
+      projectId,
+      createdAt: new Date(), // Important for sorting in useTasks
     });
     // reset
     setTitle("");

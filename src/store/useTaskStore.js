@@ -13,6 +13,7 @@ export const useTaskStore = create((set, get) => ({
 
   statusFilter: "todo", // current tab
   setStatus: (s) => set({ statusFilter: s }),
+  setTasks: (tasks) => set({ tasks }),
 
   tasks: [
     {
