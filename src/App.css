@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/*====
+    ChatPage
+====*/
 .chart-page-container {
   height: 100vh;
   display: flex;
