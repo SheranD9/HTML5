@@ -1,4 +1,8 @@
 import React from 'react';
+import GanttHeader from '../components/chart/GanttHeader';
+import GanttTimeline from '../components/chart/GanttTimeline';
+import ChangeLog from '../components/chart/ChangeLog';
+import SosButton from '../components/chart/SosButton';
 // import { FaTimes } from 'react-icons/fa';
 
 // ヘッダー部品
@@ -61,11 +65,10 @@ const ChartPage = () => {
       {/* 2. メインエリア */}
       <div className="main-content">
 
-        {/* 左側：チャート */}
+        {/* 左側：チャートエリア */}
         <div className="chart-area">
           <GanttTimeline />
-          {/* SOSボタン */}
-          <button className="sos-button">SOS</button>
+          <SosButton />
         </div>
 
         {/* 右側：サイドバー */}
