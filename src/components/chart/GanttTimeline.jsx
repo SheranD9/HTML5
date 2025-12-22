@@ -5,18 +5,9 @@ import { useTaskStore } from '../../store/useTaskStore';
 const ROW_HEIGHT = 50;
 const DAY_WIDTH = 40;
 const HEADER_HEIGHT = 30;
-const PROJECT_START = "2025-12-01";
 
 const GanttTimeline = () => {
   const { tasks } = useTaskStore();
-
-  // 日付の差分（日数）を計算する関数
-  const getDayOffset = (dateStr) => {
-    const start = new Date(PROJECT_START);
-    const target = new Date(dateStr);
-    const diffTime = target - start;
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  };
 
   // 全体の幅と高さの計算
   const totalWidth = 30 * DAY_WIDTH;
@@ -51,17 +42,20 @@ const GanttTimeline = () => {
 
         {/* タスクバー描画 */}
         {tasks.map((task, index) => {
-          const dayOffset = getDayOffset(task.startDate);
+          const dayOffset = task.startDayIndex || 0;
+          const duration = (task.endDayIndex !== undefined && task.startDayIndex !== undefined)
+            ? (task.endDayIndex - task.startDayIndex + 1)
+            : 1;
 
           // 座標計算
           const x = dayOffset * DAY_WIDTH;
           const y = index * ROW_HEIGHT + HEADER_HEIGHT + 10;
-          const width = task.duration * DAY_WIDTH;
+          const width = duration * DAY_WIDTH;
           const height = ROW_HEIGHT - 20;
 
           // ステータスごとの色分け
           const color = task.status === 'done' ? '#10B981' : // 緑
-            task.status === 'inprogress' ? '#3B82F6' : // 青
+            task.status === 'doing' ? '#3B82F6' : // 青
               '#6B7280'; // グレー
 
           return (
