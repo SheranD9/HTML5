@@ -1,66 +1,83 @@
-// src/store/useTaskStore.js
 import { create } from "zustand";
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy
+} from "firebase/firestore";
+import { db } from "../config/firebase-config";
 
 export const useTaskStore = create((set) => ({
+  tasks: [],
   logs: [],
   isEditing: false,
 
-  tasks: [
-    { id: "1", title: "要件定義", status: "done", startDate: "2025-12-01", duration: 3 },
-    { id: "2", title: "UIデザイン", status: "inprogress", startDate: "2025-12-04", duration: 5 },
-    { id: "3", title: "実装", status: "todo", startDate: "2025-12-10", duration: 7 },
-    { id: "4", title: "テスト", status: "todo", startDate: "2025-12-18", duration: 4 },
-  ],
+  subscribeTasks: () => {
+    const q = query(collection(db, "tasks"), orderBy("startDate", "asc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const tasksData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      set({ tasks: tasksData });
+    });
+    return unsubscribe;
+  },
 
-  addTask: (title) =>
-    set((state) => ({
-      tasks: [
-        ...state.tasks,
-        {
-          id: Date.now().toString(),
-          title,
-          status: "todo",
-          startDate: "2025-12-01",
-          duration: 1
-        },
-      ],
-    })),
+  addTask: async (title) => {
+    try {
+      await addDoc(collection(db, "tasks"), {
+        title,
+        status: "todo",
+        startDate: "2025-12-01",
+        duration: 1,
+        createdAt: new Date()
+      });
+      useTaskStore.getState().addLog(`タスク「${title}」を作成しました`);
+    } catch (e) {
+      console.error(e);
+    }
+  },
+
+  deleteTask: async (taskId) => {
+    if (!window.confirm("このタスクを削除しますか？")) return;
+    const taskRef = doc(db, "tasks", taskId);
+    await deleteDoc(taskRef);
+    useTaskStore.getState().addLog(`タスクを削除しました`);
+  },
+
+  updateTaskTitle: async (taskId, newTitle) => {
+    const taskRef = doc(db, "tasks", taskId);
+    await updateDoc(taskRef, { title: newTitle });
+  },
+
+  updateTaskStatus: async (taskId, newStatus) => {
+    const taskRef = doc(db, "tasks", taskId);
+    await updateDoc(taskRef, { status: newStatus });
+  },
+
+  updateTaskDate: async (taskId, newStartDate) => {
+    const taskRef = doc(db, "tasks", taskId);
+    await updateDoc(taskRef, { startDate: newStartDate });
+  },
+
+  updateTaskDuration: async (taskId, newDuration) => {
+    const taskRef = doc(db, "tasks", taskId);
+    await updateDoc(taskRef, { duration: Math.max(1, newDuration) });
+  },
 
   toggleEditing: () => set((state) => ({ isEditing: !state.isEditing })),
 
   addLog: (message) =>
     set((state) => {
       const now = new Date();
-      // 日付を "12/05 14:30" のような形式にする
       const timeStr = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
-
       return {
-        logs: [
-          { id: Date.now(), message, time: timeStr }, // 新しいログを先頭に追加
-          ...state.logs,
-        ],
+        logs: [{ id: Date.now(), message, time: timeStr }, ...state.logs],
       };
     }),
-
-  updateTaskStatus: (taskId, newStatus) =>
-    set((state) => ({
-      tasks: state.tasks.map((t) =>
-        t.id === taskId ? { ...t, status: newStatus } : t
-      ),
-    })),
-
-  updateTaskDate: (taskId, newStartDate) =>
-    set((state) => ({
-      tasks: state.tasks.map((t) =>
-        t.id === taskId ? { ...t, startDate: newStartDate } : t
-      ),
-    })),
-
-  //期間を更新する
-  updateTaskDuration: (taskId, newDuration) =>
-    set((state) => ({
-      tasks: state.tasks.map((t) =>
-        t.id === taskId ? { ...t, duration: Math.max(1, newDuration) } : t
-      ),
-    })),
 }));
