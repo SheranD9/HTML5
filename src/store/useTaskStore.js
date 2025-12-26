@@ -1,7 +1,9 @@
 import { create } from "zustand";
 
 export const useTaskStore = create((set) => ({
-  // 日付(startDate)と期間(duration)を追加したダミーデータ
+  logs: [],
+  isEditing: false,
+
   tasks: [
     { id: "1", title: "要件定義", status: "done", startDate: "2025-12-01", duration: 3 },
     { id: "2", title: "UIデザイン", status: "inprogress", startDate: "2025-12-04", duration: 5 },
@@ -13,7 +15,6 @@ export const useTaskStore = create((set) => ({
     set((state) => ({
       tasks: [
         ...state.tasks,
-        // 新規タスク作成時もデフォルトの日付を入れる
         {
           id: Date.now().toString(),
           title,
@@ -24,10 +25,41 @@ export const useTaskStore = create((set) => ({
       ],
     })),
 
+  toggleEditing: () => set((state) => ({ isEditing: !state.isEditing })),
+
+  addLog: (message) =>
+    set((state) => {
+      const now = new Date();
+      // 日付を "12/05 14:30" のような形式にする
+      const timeStr = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      return {
+        logs: [
+          { id: Date.now(), message, time: timeStr }, // 新しいログを先頭に追加
+          ...state.logs,
+        ],
+      };
+    }),
+
   updateTaskStatus: (taskId, newStatus) =>
     set((state) => ({
       tasks: state.tasks.map((t) =>
         t.id === taskId ? { ...t, status: newStatus } : t
+      ),
+    })),
+
+  updateTaskDate: (taskId, newStartDate) =>
+    set((state) => ({
+      tasks: state.tasks.map((t) =>
+        t.id === taskId ? { ...t, startDate: newStartDate } : t
+      ),
+    })),
+
+  //期間を更新する
+  updateTaskDuration: (taskId, newDuration) =>
+    set((state) => ({
+      tasks: state.tasks.map((t) =>
+        t.id === taskId ? { ...t, duration: Math.max(1, newDuration) } : t
       ),
     })),
 }));
