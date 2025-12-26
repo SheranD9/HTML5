@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
-import { db } from "./firebase"; // firebase 初期化
+import { db } from "../config/firebase-config";
 
 export default function useTasks(projectId) {
   const [tasks, setTasks] = useState([]);
