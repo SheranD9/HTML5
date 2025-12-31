@@ -9,13 +9,13 @@ import SOSButton from "../components/board/SOSButton";
 import { useTaskStore } from "../store/useTaskStore";
 import useTasks from "../hooks/useTasks";
 
-const PROJECT_ID = "web-app-1fb26"; // Replace with your actual project ID
+const PROJECT_ID = "web-app-1fb26";
 
 const BoardPage = () => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openLog, setOpenLog] = useState(false);
 
-  // 1. Fetch data from Firebase using your hook
+  // 1. Fetch tasks from Firebase / Firebaseからタスクを取得する
   const { tasks: firestoreTasks } = useTasks(PROJECT_ID);
 
   const mode = useTaskStore(s => s.mode);
@@ -24,7 +24,7 @@ const BoardPage = () => {
   const setStoreTasks = useTaskStore(s => s.setTasks);
   const filtered = tasks.filter(t => t.status === statusFilter);
 
-  // 2. Sync Firebase data into the Zustand store whenever it changes
+  // 2. Sync fetched tasks to Zustand store / 取得したタスクをZustandストアに同期する
   useEffect(() => {
     if (firestoreTasks) {
       setStoreTasks(firestoreTasks);

@@ -1,4 +1,3 @@
-// src/components/TaskCard.jsx
 import React from "react";
 import { useTaskStore } from "../../store/useTaskStore";
 
@@ -36,8 +35,8 @@ const TaskCard = ({ task }) => {
       <div className="mt-4">
         <div className="text-sm font-medium mb-2">Subtasks</div>
         <div className="flex flex-col gap-2">
-          {(task.subtasks || []).map(s => (
-            <label key={s.id} className="flex items-center gap-2 text-sm">
+          {(task.subtasks || []).map((s, idx)=> (
+            <label key={s.id || idx} className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={s.done} onChange={()=>toggleSubtask(task.id, s.id)} />
               <span className={s.done ? "line-through text-gray-500" : ""}>{s.text}</span>
             </label>

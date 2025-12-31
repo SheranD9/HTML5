@@ -1,23 +1,40 @@
-// src/components/TaskCreationModal.jsx
 import React, { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../../config/firebase-config";
 
 const TaskCreationModal = ({ open, onClose, projectId }) => {
-  // const addTask = useTaskStore((s) => s.addTask); // No longer needed, we save to DB directly
+
   const [title, setTitle] = useState("");
   const [assigned, setAssigned] = useState("");
-  const [deadline, setDeadline] = useState("");
   const [tag, setTag] = useState("");
-  const [subtasksText, setSubtasksText] = useState(""); // newline separated
   const [status, setStatus] = useState("todo");
-  const [startDayIndex, setStartDayIndex] = useState(0);
-  const [endDayIndex, setEndDayIndex] = useState(0);
+
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const [subtasks, setSubtasks] = useState(()=>[
+    { id: Date.now(), text: "" }
+  ]);
+
+  if (!open) return null;
+
+  const addSubtask = () => {
+    setSubtasks([...subtasks, { id: Date.now(), text: "" }]);
+  }
+
+  const updateSubtask = (id, value) => {
+    setSubtasks(
+      subtasks.map((s) => (s.id === id ? { ...s, text: value } : s))
+    );
+  };
+
+  const removeSubtask = (id) => {
+    setSubtasks(subtasks.filter((s) => s.id !== id));
+  };
 
   const submit = async () => {
-    const subs = subtasksText
-      .split("\n")
-      .map((s) => s.trim())
+    const cleanedSubtasks = subtasks
+      .map((s) => s.text.trim())
       .filter(Boolean)
       .map((text, i) => ({
         id: `sub-${Date.now()}-${i}`,
@@ -28,87 +45,141 @@ const TaskCreationModal = ({ open, onClose, projectId }) => {
     await addDoc(collection(db, "tasks"), {
       title,
       assigned,
-      deadline,
       tag,
-      subtasks: subs,
+      subtasks: cleanedSubtasks,
       status,
       progress: 0, // New tasks start at 0%
-      startDayIndex: Number(startDayIndex),
-      endDayIndex: Number(endDayIndex),
+      startDate,
+      endDate,
       projectId,
       createdAt: new Date(), // Important for sorting in useTasks
     });
     // reset
     setTitle("");
     setAssigned("");
-    setDeadline("");
     setTag("");
-    setSubtasksText("");
     setStatus("todo");
-    setStartDayIndex(0);
-    setEndDayIndex(0);
+    setStartDate("");
+    setEndDate("");
+    setSubtasks([{ id: Date.now(), text: "" }]);
+
     onClose();
   };
 
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white w-[720px] rounded-lg p-6 shadow-xl">
+      <div className="bg-white w-[720px] rounded-xl p-6 shadow-xl">
         <h3 className="text-xl font-semibold mb-4">Create Task</h3>
 
+         {/* Basic info */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-sm">Title</label>
-            <input value={title} onChange={e=>setTitle(e.target.value)} className="w-full border p-2 rounded mt-1"/>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              value={title}
+              onChange={e => setTitle(e.target.value)} />
           </div>
           <div>
             <label className="text-sm">Assigned</label>
-            <input value={assigned} onChange={e=>setAssigned(e.target.value)} className="w-full border p-2 rounded mt-1"/>
-          </div>
-
-          <div>
-            <label className="text-sm">Deadline</label>
-            <input value={deadline} onChange={e=>setDeadline(e.target.value)} placeholder="20 DEC 2025" className="w-full border p-2 rounded mt-1"/>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              value={assigned}
+              onChange={e => setAssigned(e.target.value)} />
           </div>
 
           <div>
             <label className="text-sm">Tag</label>
-            <input value={tag} onChange={e=>setTag(e.target.value)} className="w-full border p-2 rounded mt-1"/>
+            <input
+            className="w-full border p-2 rounded mt-1"
+              value={tag}
+              onChange={e => setTag(e.target.value)} />
           </div>
-        </div>
 
-        <div className="mt-4">
-          <label className="text-sm">Subtasks (one per line)</label>
-          <textarea value={subtasksText} onChange={e=>setSubtasksText(e.target.value)} className="w-full h-24 border p-2 rounded mt-1" placeholder={"Wireframe\nMockup\nHandoff"} />
-        </div>
-
-        <div className="mt-4 flex gap-4 items-end">
           <div>
             <label className="text-sm">Status</label>
             <select value={status} onChange={e=>setStatus(e.target.value)} className="block border p-2 rounded mt-1">
-              <option value="todo">todo</option>
-              <option value="doing">doing</option>
-              <option value="review">review</option>
-              <option value="done">done</option>
+              <option value="todo">ToDo</option>
+              <option value="doing">Doing</option>
+              <option value="review">Review</option>
+              <option value="done">Done</option>
             </select>
+            </div>
           </div>
 
-          <div>
-            <label className="text-sm">Start day index (timeline)</label>
-            <input type="number" value={startDayIndex} onChange={e=>setStartDayIndex(e.target.value)} className="w-28 border p-2 rounded mt-1"/>
-          </div>
-          <div>
-            <label className="text-sm">End day index (timeline)</label>
-            <input type="number" value={endDayIndex} onChange={e=>setEndDayIndex(e.target.value)} className="w-28 border p-2 rounded mt-1"/>
-          </div>
+          {/* Date range */}
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <div>
+              <label className="text-sm">Start Day</label>
+              <input
+                type="date"
+                className="w-full border rounded p-2 mt-1"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
 
-          <div className="ml-auto flex gap-2">
-            <button onClick={onClose} className="px-4 py-2 rounded border">Cancel</button>
-            <button onClick={submit} className="px-4 py-2 rounded bg-blue-600 text-white">Create</button>
+          <div>
+            <label className="text-sm">End Day (Deadline) </label>
+            <input
+              type="date"
+              className="w-full border rounded p-2 mt-1"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
           </div>
         </div>
-      </div>
-    </div>
+
+          {/* Subtasks */}
+          <div className="mt-6">
+            <label className="text-sm font-medium">Subtasks</label>
+
+            <div className="mt-2 space-y-2">
+              {subtasks.map((s, index)=>(
+                <div key={s.id} className="flex items-center gap-2">
+                  <input
+                    className="flex-1 border rounded p-2"
+                    placeholder={`Subtask ${index + 1}`}
+                    value={s.text}
+                    onChange={(e) => updateSubtask(s.id, e.target.value)}
+                  />
+
+                  {subtasks.length > 1 && (
+                    <button
+                      onClick={() => removeSubtask(s.id)}
+                      className="text-red-500 text-sm"
+                    >
+                      ✕
+                    </button>
+                  )}
+              </div>
+              ))}
+            </div>
+            <button
+              onClick={addSubtask}
+              className="mt-2 text-sm text-blue-600"
+            >
+              + Add Subtask
+            </button>
+          </div>
+
+          {/* Actions */}
+          <div className="flex justify-end gap-3 mt-6">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 border rounded"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={submit}
+              className="px-4 py-2 bg-blue-600 text-white rounded"
+            >Create Task</button>
+          </div>
+        </div>
+    </div >
   );
 };
 
