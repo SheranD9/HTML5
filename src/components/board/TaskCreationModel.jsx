@@ -13,13 +13,13 @@ const TaskCreationModal = ({ open, onClose, projectId }) => {
   const [endDate, setEndDate] = useState("");
 
   const [subtasks, setSubtasks] = useState(()=>[
-    { id: Date.now(), text: "" }
+    { id: Math.random(), text: "" }
   ]);
 
   if (!open) return null;
 
   const addSubtask = () => {
-    setSubtasks([...subtasks, { id: Date.now(), text: "" }]);
+    setSubtasks([...subtasks, { id: Math.random(), text: "" }]);
   }
 
   const updateSubtask = (id, value) => {
@@ -48,11 +48,11 @@ const TaskCreationModal = ({ open, onClose, projectId }) => {
       tag,
       subtasks: cleanedSubtasks,
       status,
-      progress: 0, // New tasks start at 0%
+      progress: 0,
       startDate,
       endDate,
       projectId,
-      createdAt: new Date(), // Important for sorting in useTasks
+      createdAt: new Date(),
     });
     // reset
     setTitle("");
@@ -61,7 +61,7 @@ const TaskCreationModal = ({ open, onClose, projectId }) => {
     setStatus("todo");
     setStartDate("");
     setEndDate("");
-    setSubtasks([{ id: Date.now(), text: "" }]);
+    setSubtasks([{ id: Math.random(), text: "" }]);
 
     onClose();
   };
