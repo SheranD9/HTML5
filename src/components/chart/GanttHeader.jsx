@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTaskStore } from '../../store/useTaskStore';
 
-const GanttHeader = () => {
+const GanttHeader = ({ onToggleLog }) => {
   const { isEditing, toggleEditing, addTask } = useTaskStore();
+  const navigate = useNavigate();
 
   const handleAddTask = () => {
     const title = window.prompt("新しいタスクの名前を入力してください", "新規タスク");
@@ -19,6 +21,36 @@ const GanttHeader = () => {
       </div>
 
       <div style={{ display: 'flex', gap: '10px' }}>
+        <button
+          onClick={() => navigate('/')}
+          style={{
+            backgroundColor: '#fff',
+            color: '#333',
+            border: '1px solid #ccc',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            fontSize: '1rem',
+            cursor: 'pointer'
+          }}
+        >
+          ボードへ
+        </button>
+
+        <button
+          onClick={onToggleLog}
+          style={{
+            backgroundColor: '#fff',
+            color: '#333',
+            border: '1px solid #ccc',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            fontSize: '1rem',
+            cursor: 'pointer'
+          }}
+        >
+          変更ログ
+        </button>
+
         {isEditing && (
           <button
             onClick={handleAddTask}

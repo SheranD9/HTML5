@@ -1,18 +1,34 @@
 import React from 'react';
 import { useTaskStore } from '../../store/useTaskStore';
 
-const ChangeLog = () => {
+const ChangeLog = ({ onClose }) => {
   const { logs } = useTaskStore();
 
   return (
-    <div className="sidebar-area">
+    <div className="sidebar-area" style={{
+      width: '300px',
+      backgroundColor: '#e0e0e0',
+      borderLeft: '1px solid #ccc',
+      padding: '20px',
+      display: 'flex',
+      flexDirection: 'column',
+      overflowY: 'auto',
+      height: '100%'
+    }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
         <h2>変更ログ</h2>
-        <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+        <button
+          onClick={onClose}
+          style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}
+        >
+          ×
+        </button>
       </div>
+
       {logs.length === 0 && (
         <p style={{ color: '#999', fontSize: '0.9rem' }}>まだ通知はありません</p>
       )}
+
       {logs.map((log) => (
         <div key={log.id} style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'white', flexShrink: 0 }}></div>

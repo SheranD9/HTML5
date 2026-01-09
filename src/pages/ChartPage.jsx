@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTaskStore } from '../store/useTaskStore';
 
 import GanttHeader from '../components/chart/GanttHeader';
@@ -8,6 +8,7 @@ import SosButton from '../components/chart/SosButton';
 
 const ChartPage = () => {
   const { isEditing, subscribeTasks } = useTaskStore();
+  const [showLog, setShowLog] = useState(false);
 
   useEffect(() => {
     const unsubscribe = subscribeTasks();
@@ -16,13 +17,15 @@ const ChartPage = () => {
 
   return (
     <div className="chart-page-container">
-      <GanttHeader />
+      <GanttHeader onToggleLog={() => setShowLog(true)} />
       <div className="main-content">
         <div className={`chart-area ${isEditing ? 'editing-mode' : ''}`}>
           <GanttTimeline />
           <SosButton />
         </div>
-        <ChangeLog />
+        {showLog && (
+          <ChangeLog onClose={() => setShowLog(false)} />
+        )}
       </div>
     </div>
   );
