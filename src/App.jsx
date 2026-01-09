@@ -4,14 +4,13 @@ import "./App.css";
 import BoardPage from "./pages/BoardPage";
 import ChartPage from "./pages/ChartPage";
 import Header from "./components/Header/header.jsx";
-import Sidebar from "./components/sidebar/sidebar.jsx";
 
 function App() {
   return (
     <Router>
       <div className="app-container">
         <Header />
-        <Sidebar />
+
         <Routes>
           <Route path="/" element={<BoardPage />} />
 

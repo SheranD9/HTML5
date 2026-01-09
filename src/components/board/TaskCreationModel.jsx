@@ -1,9 +1,9 @@
 // src/components/TaskCreationModal.jsx
 import React, { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
-import { db } from "../../config/firebase-config";
+import { db } from "../../config/firebase-Config";
 
-const TaskCreationModal = ({ open, onClose, projectId }) => {
+function TaskCreationModal({ open, onClose, projectId }) {
   // const addTask = useTaskStore((s) => s.addTask); // No longer needed, we save to DB directly
   const [title, setTitle] = useState("");
   const [assigned, setAssigned] = useState("");
@@ -22,7 +22,7 @@ const TaskCreationModal = ({ open, onClose, projectId }) => {
       .map((text, i) => ({
         id: `sub-${Date.now()}-${i}`,
         text,
-        done: false
+        done: false,
       }));
 
     await addDoc(collection(db, "tasks"), {
@@ -59,33 +59,59 @@ const TaskCreationModal = ({ open, onClose, projectId }) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-sm">Title</label>
-            <input value={title} onChange={e=>setTitle(e.target.value)} className="w-full border p-2 rounded mt-1"/>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full border p-2 rounded mt-1"
+            />
           </div>
           <div>
             <label className="text-sm">Assigned</label>
-            <input value={assigned} onChange={e=>setAssigned(e.target.value)} className="w-full border p-2 rounded mt-1"/>
+            <input
+              value={assigned}
+              onChange={(e) => setAssigned(e.target.value)}
+              className="w-full border p-2 rounded mt-1"
+            />
           </div>
 
           <div>
             <label className="text-sm">Deadline</label>
-            <input value={deadline} onChange={e=>setDeadline(e.target.value)} placeholder="20 DEC 2025" className="w-full border p-2 rounded mt-1"/>
+            <input
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+              placeholder="20 DEC 2025"
+              className="w-full border p-2 rounded mt-1"
+            />
           </div>
 
           <div>
             <label className="text-sm">Tag</label>
-            <input value={tag} onChange={e=>setTag(e.target.value)} className="w-full border p-2 rounded mt-1"/>
+            <input
+              value={tag}
+              onChange={(e) => setTag(e.target.value)}
+              className="w-full border p-2 rounded mt-1"
+            />
           </div>
         </div>
 
         <div className="mt-4">
           <label className="text-sm">Subtasks (one per line)</label>
-          <textarea value={subtasksText} onChange={e=>setSubtasksText(e.target.value)} className="w-full h-24 border p-2 rounded mt-1" placeholder={"Wireframe\nMockup\nHandoff"} />
+          <textarea
+            value={subtasksText}
+            onChange={(e) => setSubtasksText(e.target.value)}
+            className="w-full h-24 border p-2 rounded mt-1"
+            placeholder={"Wireframe\nMockup\nHandoff"}
+          />
         </div>
 
         <div className="mt-4 flex gap-4 items-end">
           <div>
             <label className="text-sm">Status</label>
-            <select value={status} onChange={e=>setStatus(e.target.value)} className="block border p-2 rounded mt-1">
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="block border p-2 rounded mt-1"
+            >
               <option value="todo">todo</option>
               <option value="doing">doing</option>
               <option value="review">review</option>
@@ -95,21 +121,38 @@ const TaskCreationModal = ({ open, onClose, projectId }) => {
 
           <div>
             <label className="text-sm">Start day index (timeline)</label>
-            <input type="number" value={startDayIndex} onChange={e=>setStartDayIndex(e.target.value)} className="w-28 border p-2 rounded mt-1"/>
+            <input
+              type="number"
+              value={startDayIndex}
+              onChange={(e) => setStartDayIndex(e.target.value)}
+              className="w-28 border p-2 rounded mt-1"
+            />
           </div>
           <div>
             <label className="text-sm">End day index (timeline)</label>
-            <input type="number" value={endDayIndex} onChange={e=>setEndDayIndex(e.target.value)} className="w-28 border p-2 rounded mt-1"/>
+            <input
+              type="number"
+              value={endDayIndex}
+              onChange={(e) => setEndDayIndex(e.target.value)}
+              className="w-28 border p-2 rounded mt-1"
+            />
           </div>
 
           <div className="ml-auto flex gap-2">
-            <button onClick={onClose} className="px-4 py-2 rounded border">Cancel</button>
-            <button onClick={submit} className="px-4 py-2 rounded bg-blue-600 text-white">Create</button>
+            <button onClick={onClose} className="px-4 py-2 rounded border">
+              Cancel
+            </button>
+            <button
+              onClick={submit}
+              className="px-4 py-2 rounded bg-blue-600 text-white"
+            >
+              Create
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default TaskCreationModal;
