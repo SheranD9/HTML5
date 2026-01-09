@@ -53,9 +53,9 @@ const BoardPage = () => {
           </button>
 
           <button
-            onClick={() => setShowLog(true)}
+            onClick={() => setShowLog(!showLog)}
             style={{
-              backgroundColor: '#fff',
+              backgroundColor: showLog ? '#e0e0e0' : '#fff',
               color: '#333',
               border: '1px solid #ccc',
               padding: '8px 16px',

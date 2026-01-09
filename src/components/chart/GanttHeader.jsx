@@ -16,7 +16,7 @@ const GanttHeader = ({ onToggleLog }) => {
   return (
     <div className="header-section">
       <div>
-        <div className="header-title">Plooty(プロジェクトの名前)</div>
+        <div className="header-title">Plooty チャート</div>
         <div style={{ fontSize: '0.8rem', color: '#666' }}>期間: 2025/12/01〜2025/12/31</div>
       </div>
 

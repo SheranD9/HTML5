@@ -17,7 +17,8 @@ const ChartPage = () => {
 
   return (
     <div className="chart-page-container">
-      <GanttHeader onToggleLog={() => setShowLog(true)} />
+      <GanttHeader onToggleLog={() => setShowLog(!showLog)} />
+
       <div className="main-content">
         <div className={`chart-area ${isEditing ? 'editing-mode' : ''}`}>
           <GanttTimeline />
